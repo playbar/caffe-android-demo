@@ -1,5 +1,6 @@
 package com.sh1r0.caffe_android_demo;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -62,6 +63,16 @@ public class MainActivity extends Activity implements CNNListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(PermissionUtils.checkPermission( MainActivity.this,new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        },200))
+        {
+
+
+        }
 
         ivCaptured = (ImageView) findViewById(R.id.ivCaptured);
         tvLabel = (TextView) findViewById(R.id.tvLabel);
