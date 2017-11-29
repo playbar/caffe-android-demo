@@ -8,12 +8,17 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 ADD_DEFINITIONS(-DEGL_EGLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DCPU_ONLY)
+#ADD_DEFINITIONS(-DUSE_OPENMP)
 
 
 
 #add_library(lib_caffe SHARED IMPORTED)
 #set_target_properties(lib_caffe PROPERTIES IMPORTED_LOCATION
 #    ${CMAKE_CURRENT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libcaffe.so)
+
+add_library(lib_gflags STATIC IMPORTED)
+set_target_properties(lib_gflags PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/gflags/lib/libgflags.a)
 
 add_library(lib_glog STATIC IMPORTED)
 set_target_properties(lib_glog PROPERTIES IMPORTED_LOCATION
@@ -22,6 +27,18 @@ set_target_properties(lib_glog PROPERTIES IMPORTED_LOCATION
 add_library(lib_protobuf STATIC IMPORTED)
 set_target_properties(lib_protobuf PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/protobuf/lib/libprotobuf.a)
+
+add_library(lib_boost_system STATIC IMPORTED)
+set_target_properties(lib_boost_system PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_system.a)
+
+add_library(lib_boost_thread STATIC IMPORTED)
+set_target_properties(lib_boost_thread PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_thread.a)
+
+add_library(lib_openblas STATIC IMPORTED)
+set_target_properties(lib_openblas PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/openblas/lib/libopenblas_armv8p-r0.2.18.a)
 
 add_library( caffe SHARED
             caffe/src/caffe/layers/absval_layer.cpp
@@ -144,8 +161,12 @@ target_include_directories(caffe PRIVATE
 target_link_libraries(caffe
                       log
                       z
+                      lib_gflags
                       lib_glog
                       lib_protobuf
+                      lib_boost_system
+                      lib_boost_thread
+                      lib_openblas
                       )
 
 
