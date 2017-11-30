@@ -12,6 +12,8 @@ ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DCPU_ONLY)
 #ADD_DEFINITIONS(-DUSE_OPENMP)
 ADD_DEFINITIONS(-DUSE_LMDB)
+ADD_DEFINITIONS(-DHAVE_JPEG)
+
 
 
 #add_library(lib_caffe SHARED IMPORTED)
@@ -82,6 +84,19 @@ add_library(lib_openblas STATIC IMPORTED)
 set_target_properties(lib_openblas PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/openblas/lib/libopenblas_armv8p-r0.2.18.a)
 
+add_library(lib_IlmImf STATIC IMPORTED)
+set_target_properties(lib_IlmImf PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/libIlmImf.a)
+
+add_library(lib_libjasper STATIC IMPORTED)
+set_target_properties(lib_libjasper PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibjasper.a)
+
+add_library(lib_libjpeg STATIC IMPORTED)
+set_target_properties(lib_libjpeg PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibjpeg.a)
+
+
 add_library(lib_libpng STATIC IMPORTED)
 set_target_properties(lib_libpng PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibpng.a)
@@ -89,6 +104,10 @@ set_target_properties(lib_libpng PROPERTIES IMPORTED_LOCATION
 add_library(lib_libtiff STATIC IMPORTED)
 set_target_properties(lib_libtiff PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibtiff.a)
+
+add_library(lib_libwebp STATIC IMPORTED)
+set_target_properties(lib_libwebp PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibwebp.a)
 
 add_library(lib_opencv_calib3d STATIC IMPORTED)
 set_target_properties(lib_opencv_calib3d PROPERTIES IMPORTED_LOCATION
@@ -98,6 +117,18 @@ add_library(lib_opencv_core STATIC IMPORTED)
 set_target_properties(lib_opencv_core PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_core.a)
 
+add_library(lib_opencv_features2d STATIC IMPORTED)
+set_target_properties(lib_opencv_features2d PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_features2d.a)
+
+add_library(lib_opencv_flann STATIC IMPORTED)
+set_target_properties(lib_opencv_flann PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_flann.a)
+
+add_library(lib_opencv_highgui STATIC IMPORTED)
+set_target_properties(lib_opencv_highgui PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_highgui.a)
+
 add_library(lib_opencv_imgcodecs STATIC IMPORTED)
 set_target_properties(lib_opencv_imgcodecs PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_imgcodecs.a)
@@ -105,6 +136,10 @@ set_target_properties(lib_opencv_imgcodecs PROPERTIES IMPORTED_LOCATION
 add_library(lib_opencv_imgproc STATIC IMPORTED)
 set_target_properties(lib_opencv_imgproc PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_imgproc.a)
+
+add_library(lib_opencv_ml STATIC IMPORTED)
+set_target_properties(lib_opencv_ml PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_ml.a)
 
 
 add_library( caffe SHARED
@@ -246,12 +281,20 @@ target_link_libraries(caffe
                       lib_boost_system
                       lib_boost_thread
                       lib_openblas
+                      lib_IlmImf
+                      lib_libjasper
+                      lib_libjpeg
                       lib_libpng
                       lib_libtiff
+                      lib_libwebp
                       lib_opencv_calib3d
                       lib_opencv_core
+                      lib_opencv_features2d
+                      lib_opencv_flann
+                      lib_opencv_highgui
                       lib_opencv_imgcodecs
                       lib_opencv_imgproc
+                      lib_opencv_ml
                       )
 
 
@@ -271,8 +314,8 @@ target_include_directories(caffe_jni PRIVATE
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/opencv/sdk/native/jni/include )
 
 target_link_libraries(caffe_jni
-                      log
-                      caffe
-                      z)
+                    log
+                    caffe
+                    z)
 
 
