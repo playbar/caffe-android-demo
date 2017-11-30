@@ -2,14 +2,16 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_BUILD_TYPE "Release")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fexceptions -frtti")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fopenmp -fexceptions -frtti
+                      -DBLAS=open
+                      USE_THREAD=1 NUM_THREADS=8 USE_OPENMP=1")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
 ADD_DEFINITIONS(-DEGL_EGLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DCPU_ONLY)
 #ADD_DEFINITIONS(-DUSE_OPENMP)
-
+ADD_DEFINITIONS(-DUSE_LMDB)
 
 
 #add_library(lib_caffe SHARED IMPORTED)
@@ -24,9 +26,49 @@ add_library(lib_glog STATIC IMPORTED)
 set_target_properties(lib_glog PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/glog/lib/libglog.a)
 
+add_library(lib_lmdb STATIC IMPORTED)
+set_target_properties(lib_lmdb PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/lmdb/lib/liblmdb.a)
+
 add_library(lib_protobuf STATIC IMPORTED)
 set_target_properties(lib_protobuf PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/protobuf/lib/libprotobuf.a)
+
+add_library(lib_boost_atomic STATIC IMPORTED)
+set_target_properties(lib_boost_atomic PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_atomic.a)
+
+add_library(lib_boost_date_time STATIC IMPORTED)
+set_target_properties(lib_boost_date_time PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_date_time.a)
+
+add_library(lib_boost_filesystem STATIC IMPORTED)
+set_target_properties(lib_boost_filesystem PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_filesystem.a)
+
+add_library(lib_boost_iostreams STATIC IMPORTED)
+set_target_properties(lib_boost_iostreams PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_iostreams.a)
+
+add_library(lib_boost_math STATIC IMPORTED)
+set_target_properties(lib_boost_math PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_math.a)
+
+add_library(lib_boost_program_options STATIC IMPORTED)
+set_target_properties(lib_boost_program_options PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_program_options.a)
+
+add_library(lib_boost_random STATIC IMPORTED)
+set_target_properties(lib_boost_random PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_random.a)
+
+add_library(lib_boost_regex STATIC IMPORTED)
+set_target_properties(lib_boost_regex PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_regex.a)
+
+add_library(lib_boost_signals STATIC IMPORTED)
+set_target_properties(lib_boost_signals PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/boost/lib/libboost_signals.a)
 
 add_library(lib_boost_system STATIC IMPORTED)
 set_target_properties(lib_boost_system PROPERTIES IMPORTED_LOCATION
@@ -39,6 +81,31 @@ set_target_properties(lib_boost_thread PROPERTIES IMPORTED_LOCATION
 add_library(lib_openblas STATIC IMPORTED)
 set_target_properties(lib_openblas PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/openblas/lib/libopenblas_armv8p-r0.2.18.a)
+
+add_library(lib_libpng STATIC IMPORTED)
+set_target_properties(lib_libpng PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibpng.a)
+
+add_library(lib_libtiff STATIC IMPORTED)
+set_target_properties(lib_libtiff PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibtiff.a)
+
+add_library(lib_opencv_calib3d STATIC IMPORTED)
+set_target_properties(lib_opencv_calib3d PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_calib3d.a)
+
+add_library(lib_opencv_core STATIC IMPORTED)
+set_target_properties(lib_opencv_core PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_core.a)
+
+add_library(lib_opencv_imgcodecs STATIC IMPORTED)
+set_target_properties(lib_opencv_imgcodecs PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_imgcodecs.a)
+
+add_library(lib_opencv_imgproc STATIC IMPORTED)
+set_target_properties(lib_opencv_imgproc PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/libs/arm64-v8a/libopencv_imgproc.a)
+
 
 add_library( caffe SHARED
             caffe/src/caffe/layers/absval_layer.cpp
@@ -143,6 +210,7 @@ add_library( caffe SHARED
             caffe/src/caffe/parallel.cpp
             caffe/src/caffe/solver.cpp
             caffe/src/caffe/syncedmem.cpp
+            #OpenBLAS/lapack-netlib/CBLAS/src/cblas_sdot.c
             )
 
 target_include_directories(caffe PRIVATE
@@ -152,6 +220,7 @@ target_include_directories(caffe PRIVATE
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/gflags/include
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/glog/include
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/glog/include/glog
+                          ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/lmdb/include
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/protobuf/include
                           ${CMAKE_CURRENT_SOURCE_DIR}/android_lib/opencv/sdk/native/jni/include
                           ${CMAKE_CURRENT_SOURCE_DIR}/caffe/src
@@ -163,10 +232,26 @@ target_link_libraries(caffe
                       z
                       lib_gflags
                       lib_glog
+                      lib_lmdb
                       lib_protobuf
+                      lib_boost_atomic
+                      lib_boost_date_time
+                      lib_boost_filesystem
+                      lib_boost_iostreams
+                      lib_boost_math
+                      lib_boost_program_options
+                      lib_boost_random
+                      lib_boost_regex
+                      lib_boost_signals
                       lib_boost_system
                       lib_boost_thread
                       lib_openblas
+                      lib_libpng
+                      lib_libtiff
+                      lib_opencv_calib3d
+                      lib_opencv_core
+                      lib_opencv_imgcodecs
+                      lib_opencv_imgproc
                       )
 
 
