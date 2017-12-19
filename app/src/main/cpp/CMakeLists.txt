@@ -5,7 +5,7 @@ set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fopenmp -fexceptions -frtti
                       -DBLAS=open
                       USE_THREAD=1 NUM_THREADS=8 USE_OPENMP=1")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
 ADD_DEFINITIONS(-DEGL_EGLEXT_PROTOTYPES)
 ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
@@ -93,7 +93,10 @@ set_target_properties(lib_libjasper PROPERTIES IMPORTED_LOCATION
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibjasper.a)
 
 add_library(lib_libjpeg STATIC IMPORTED)
-set_target_properties(lib_libjpeg PROPERTIES IMPORTED_LOCATION
+set_property(TARGET lib_libjpeg APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(lib_libjpeg PROPERTIES
+    IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C"
+    IMPORTED_LOCATION_RELEASE
     ${CMAKE_SOURCE_DIR}/android_lib/opencv/sdk/native/3rdparty/libs/arm64-v8a/liblibjpeg.a)
 
 
